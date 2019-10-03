@@ -1,0 +1,20 @@
+#include<stdio.h>
+int main()
+{
+	int i,n,k,sum;
+	char a[100][100];
+	while(scanf("%d",&n)!=EOF)
+	{
+		
+	
+		for (i=0;i<n;i++)
+		getchar(),gets(a[i]);
+		for(i=0;i<n;i++)
+		{sum=0;
+			for(k=0;a[i][k]!='\0';k++)
+			if((a[i][k]>='0')&&(a[i][k]<='9'))sum++;	
+			printf("%d\n",sum);
+		}
+	}
+	return 0;
+}

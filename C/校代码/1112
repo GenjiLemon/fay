@@ -1,0 +1,42 @@
+
+
+#include<stdio.h>
+int main()
+{
+	int N,M,o,i,k;
+	__int64 cnm(int m,int n),sum;
+	scanf("%d",&N);
+	for(i=0;i<N;i++)
+	{
+		sum=0;
+		scanf("%d",&M);
+		if(M==1) {printf("0\n");continue;}
+		M=M-1;
+		for(k=(M+1)/2;k<=M;k++)
+		{
+			o=2*k-M;
+			sum+=cnm(o,k);
+		}
+		printf("%lld\n",sum);
+		
+	}
+	return 0;
+	
+	
+}
+__int64 cnm(int m,int n)
+{
+	__int64 z=1;
+	double l;
+	int i;
+	if(m==0)z=1;
+	else
+	for(i=1;i<=m;i++)
+	{
+		l=i;
+		z*=(n-m+i)/l;
+	}
+	
+	
+	return z; 
+}

@@ -1,0 +1,769 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include<string.h>
+#include<windows.h>
+	typedef struct time {
+		int year;
+		int month;
+		int day;
+		int hour;									//-1为忘了具体时间
+	}ttime;											//时间结构体
+
+typedef struct changedata{
+	ttime t; 		       					 //时间
+	int changetype;						//0为收入 1为支出
+	float money;						//产生的金额
+	float balance;						//余额
+ 	int moneytype;						//金额的方式（0现金1支付宝2微信3银行卡4其他）
+	 changedata *next;					//下一条记录
+}changedata;
+
+	typedef struct pointersnode{
+		changedata *data;
+		bool visit;							//visit==1表示已经使用过这结点了
+		pointersnode *next;
+	}pointersnode,*pointers;					//指向结构体指针的结构体链表   生成新链为了记录结构体顺序
+
+changedata	*mymoney=(changedata*)malloc(sizeof(changedata));					//主链表的头节点 不存内容
+FILE *fp;
+//函数声明
+ttime GetTime();									//获取系统当前时间
+void AddData(changedata *mymoney,bool today);		//添加数据  （是否今日）
+void GetBalance();									//获取当前余额
+void load();									//载入函数
+void Save();										//保存
+bool compare(changedata *a,changedata *b);			//判断时间先后的函数
+pointers Findbytime(int model);						//交易时间查找
+pointers Findbytype(int model);						//交易类型查找
+pointers show(pointers showlink,int tag,int model);//展示函数（展示链，展示类型，展示模式）
+void Change();					//修改
+void menu();					//一级菜单
+//函数声明
+
+
+ttime GetTime()							//获取计算机当前时间的函数  返回结构体ttime
+{
+	struct time t;
+	time_t timep;
+    struct tm *p;
+    time (&timep);
+    p=gmtime(&timep);
+    t.year=1900+p->tm_year;
+    t.month=1+p->tm_mon;
+    t.day=p->tm_mday;
+    t.hour=8+p->tm_hour;
+    if(t.hour>=24)
+    {t.hour%=24;
+    t.day++;}
+    return t;
+}
+
+void AddData(changedata *mymoney,bool today)			//分为添加今日和添加往日
+{
+	system("cls");										//清屏
+	changedata *p=mymoney,*s;
+								//结构体指针  用于链表的添加
+	while(p->next)										//找到最后的一个节点
+		{
+			p=p->next;
+		}
+	if(!(s=(changedata*)malloc(sizeof(changedata))))	//创建新节点
+		{
+			printf("内存不够啦\n");
+			Sleep(500);
+		}
+	s->next=NULL;
+	if(!today)											//往日添加
+	{
+		printf("请输入想要添加的时间：（以下均填整数）\n");
+		printf("年：");
+		scanf("%d",&s->t.year);
+		printf("月：");
+		scanf("%d",&s->t.month);
+		printf("日(输入-1则只记到月)：");
+		scanf("%d",&s->t.day);
+		if(~(s->t.day))
+		{
+			printf("小时(输入-1则只记到日)：");
+			scanf("%d",&s->t.hour);
+		}
+		else 	s->t.hour=-1; 							//如果日==-1则小时也是-1
+		printf("请输入那次是支出还是收入\t\t0--收入，1--支出\n");
+		scanf("%d",&s->changetype);
+		printf("请输入交易产生的途径\t\t0--现金，1--支付宝，2--微信，3--银行卡，4--其他\n");
+		scanf("%d",&s->moneytype);
+		if(s->changetype)
+		{
+			printf("\n请输入支出金额（元）：\n");
+			scanf("%f",&s->money);
+			s->balance=p->balance-s->money;				//计算当前余额
+		}
+		else
+		{	printf("\n请输入收入金额（元）：\n");
+			scanf("%f",&s->money);
+			s->balance=p->balance+s->money;
+		}
+
+	}
+	else											//添加当日记录
+	{
+		ttime t;
+ 		t=GetTime();
+		s->t.year=t.year;
+		s->t.month=t.month;
+		s->t.day=t.day;								//时间赋值
+		printf("请输入今日金额变动的时间(输入-1则不记录具体时间):\n时：");
+		scanf("%d",&s->t.hour);
+		printf("请输入是支出还是收入\t\t0--收入，1--支出\n");
+		scanf("%d",&s->changetype);
+		printf("请输入交易产生的途径\t\t0--现金，1--支付宝，2--微信，3--银行卡，4--其他\n");
+		scanf("%d",&s->moneytype);
+		if(s->changetype)
+		{
+			printf("\n请输入支出金额（元）：\n");
+			scanf("%f",&s->money);
+			s->balance=p->balance-s->money;
+		}
+		else
+		{	printf("\n请输入收入金额（元）：\n");
+			scanf("%f",&s->money);
+			s->balance=p->balance+s->money;
+		}
+
+	}
+	printf("是否保存？  0--否，1--是\n");
+	int sel;
+	scanf("%d",&sel);
+	if(sel)
+	{
+		p->next=s;
+		p=p->next;
+		Save();
+	}
+	else
+	{
+		free(s);
+		s=NULL;
+	}
+}
+
+void GetBalance()									//只有最后一个节点的balance有用  可以显示当前余额
+{
+	changedata *p;
+	p=mymoney;
+	if(!(p->next)) 									//如果没有记录 说明是第一次使用
+	{
+		printf("您还没有任何记帐信息，赶快记录一个吧\n");
+	Sleep(2000);
+		return ;
+	}
+	while(p->next)									//找尾节点
+	{
+
+		p=p->next;
+	}
+	printf("您当前还有%.2f元哦\n",p->balance);
+	Sleep(2000);
+}
+
+ void load()										//修改记录
+{
+	int i;					//用于判断数据是否丢失 也用于判断是否结束
+	changedata *p;
+	changedata *s=mymoney;
+	fp=fopen("jzxt.txt","r");
+	if(!fp)
+	{
+		printf("欢迎您使用小安记帐系统，让你更清楚你的钱的动向\n");   //第一次打开本应用时的界面友好
+		printf("第一次使用本程序，正在创建数据文件\n");
+		printf("小安努力准备中");
+		for(int i=0;i<5;i++)
+			{
+				printf(".");
+				Sleep(500);
+			}
+
+		printf("\n加载成功！\n");
+	}
+
+	else {
+
+		while(1)								//feof（）到文件末尾返回非0 否则返回0
+		 {
+		 p=(changedata*)malloc(sizeof(changedata));
+		 p->next=NULL;
+ 		 i=(fscanf(fp,"%d%d%d%d%d%f%f%d",&p->t.year,&p->t.month,&p->t.day,
+					&p->t.hour,&p->changetype,&p->money,&p->balance,&p->moneytype));
+        if(i==EOF)break;
+		 s->next=p;
+		 s=s->next;
+		 }
+
+	}
+	fclose(fp);
+												//返回
+}
+
+void Save()
+{
+	fp=fopen("jzxt.txt","w");
+	if(!fp)
+	{
+		printf("打不开文件\n");
+		Sleep(1000);
+	}
+	changedata *p;
+	p=mymoney->next;								//从结构体链表头开始存入
+	while(p)
+	{
+		fprintf(fp,"%d %d %d %d %d %.2f %.2f %d ",p->t.year,p->t.month,p->t.day,
+		 			p->t.hour,p->changetype,p->money,p->balance,p->moneytype);
+		p=p->next;
+	}
+	fclose(fp);
+}
+
+bool compare(changedata *a,changedata *b)			  					//比较ab的时间先后  a比b后为1 否则为0
+{
+	if(a->t.year!=b->t.year)return a->t.year>b->t.year;
+	if(a->t.month!=b->t.month)return a->t.month>b->t.month;
+	if(a->t.day!=b->t.day)return a->t.day>b->t.day;
+	if(a->t.hour!=b->t.hour)return a->t.hour>=b->t.hour;
+
+}
+
+pointers Findbytime(int model)								//model==0为查找模式  model==1为查找并保持（方便修改）
+{
+	system("cls");
+	int yst=-1,mst=-1,dst=-1,hst=-1;						//选择时间
+	int sel;												//选择全部还是部分
+	printf("提示：输入#返回主菜单\n");
+	printf("请输入要查询的年（输入-1为查看所有记录）\n");  	//判断是否回主菜单
+	scanf("%d",&yst);
+	if(yst=='#')return NULL;
+	if(~yst)
+	{
+		printf("请输入查询的月（输入-1为查看%d年所有记录）",yst);
+		scanf("%d",&mst);
+		if(~mst)
+		{
+			printf("请输入查询的日（输入-1为查看%d月所有记录）",mst);
+			scanf("%d",&dst);
+			if(~dst)
+			{
+				printf("请输入查询的小时（输入-1为查看%d日所有记录）",dst);
+				scanf("%d",&hst);
+			}
+		}
+	}
+	printf("是否只显示收入或支出？\n");
+	printf("-1--显示所有，0--显示收入，1--显示支出\n");
+	scanf("%d",&sel);
+	changedata *p;											//指向原来的链表
+	pointers showlink,s,m;									//showlink链表
+	showlink=(pointers)malloc(sizeof(pointersnode));
+	showlink->next=NULL;
+	showlink->data=NULL;
+	p=mymoney->next;										//创建一个showlink链表传给show函数进行展示
+	m=showlink;												//showlink链的建立指针
+	if(~yst)												//区分所有时间的是不是-1
+	{
+		if(~mst)
+		{
+			if(~dst)
+			{
+				if(~hst)
+				{
+					while(p)
+					{
+						if(p->t.year==yst&&p->t.month==mst&&p->t.day==dst&&p->t.hour==hst)		//满足条件就链起来
+						{
+							s=(pointers)malloc(sizeof(pointersnode));
+							s->visit=0;				//赋初值表示未被访问过
+							s->next=NULL;
+							s->data=p;
+							m->next=s;
+							m=m->next;
+						}
+						p=p->next;
+					}
+				}
+				else
+				{
+					while(p)
+					{
+						if(p->t.year==yst&&p->t.month==mst&&p->t.day==dst)
+						{
+							s=(pointers)malloc(sizeof(pointersnode));
+							s->visit=0;
+							s->next=NULL;
+							s->data=p;
+							m->next=s;
+							m=m->next;
+						}
+						p=p->next;
+					}
+
+				}
+
+			}
+			else
+			{
+				while(p)
+				{
+					if(p->t.year==yst&&p->t.month==mst)
+					{
+						s=(pointers)malloc(sizeof(pointersnode));
+						s->visit=0;
+						s->next=NULL;
+						s->data=p;
+						m->next=s;
+						m=m->next;
+					}
+						p=p->next;
+				}
+
+			}
+
+		}
+		else
+		{
+			while(p)
+			{
+				if(p->t.year==yst)
+					{
+						s=(pointers)malloc(sizeof(pointersnode));
+						s->visit=0;
+						s->next=NULL;
+						s->data=p;
+						m->next=s;
+						m=m->next;
+					}
+					p=p->next;
+			}
+		}
+	}
+	else
+	{
+		while(p)
+		{
+
+			s=(pointers)malloc(sizeof(pointersnode));
+			s->visit=0;
+			s->next=NULL;
+			s->data=p;
+			m->next=s;
+			m=m->next;
+			p=p->next;
+		}
+	}
+
+	if(model)										//修改模式下  需要传回一个plink链表  为了表示实际显示的所有信息
+															//方便根据序号修改
+	{
+		pointers plink;
+		plink=show(showlink,sel,model);
+		return plink;
+	}
+	show(showlink,sel,model);							//sel是显示支出还是收入  0收入  1支出
+}
+
+pointers Findbytype(int model)
+{
+	system("cls");
+ 	int tag; 											//查看的类型 （收入支出changetype）
+	int typest;											//查找类型（moneytype）
+	printf("提示:输入#返回主菜单\n");
+	printf("请输入需要查询的交易方式\n");
+	printf("0--现金，1--支付宝，2--微信，3--银行卡，4--其他\n");
+	scanf("%d",&typest);
+	if(typest=='#')return NULL;
+	printf("请输入需要查询的类型\n");
+	printf("-1--所有,0--收入，1--支出\n");
+	scanf("%d",&tag);
+	pointers showlink,s,m;							//开始建立showlink函数
+	showlink=(pointers)malloc(sizeof(pointersnode));
+	showlink->next=NULL;
+	showlink->data=NULL;
+    s=showlink;
+	changedata *p=mymoney->next;
+	while(p)
+	{
+		if(p->moneytype==typest)					//符合交易类型就链起来
+		{
+			m=(pointers)malloc(sizeof(pointersnode));
+			m->next=NULL;
+			m->data=p;
+			m->visit=0;
+			s->next=m;
+			s=s->next;
+		}
+		p=p->next;
+	}
+	if(model)										//修改模式下返回plink链表
+	{
+		pointers plink;
+		plink=show(showlink,tag,model);
+		return plink;
+	}
+	show(showlink,tag,model);
+
+}
+
+pointers show(pointers showlink,int tag,int model)			//查找后的按时间排序的输出函数
+{
+		char changety[20],moneyty[20];					//把类型变中文
+		pointers plink;
+		plink=(pointers)malloc(sizeof(pointersnode));
+		plink->next=NULL;
+		plink->data=NULL;						//实际输出的序列
+		pointers plink_p=plink,plink_s;						//中间节点
+        system("cls");
+	if(!(showlink->next))									//链表为空
+	{
+		printf("找不到所要查找的信息\n");
+		if(!model)
+		{
+			bool m;
+			printf("是否返回主菜单？0--更改查找信息继续查找，1--返回主菜单");
+			scanf("%d",&m);
+			if(m)return NULL ;
+			else Findbytime(model);
+		}
+	}
+	pointers p,s=NULL;		//p用来遍历  s是找每次时间上的最小值
+	p=showlink->next;
+	if(tag==-1)
+	{
+		printf("筛选条件下的所有信息(-1表示未记录)\n\n");
+		printf("序号\t\t时间\t\t        类型\t  交易方式\t\t金额\n");
+		printf("--------------------------------------------------------------------------------\n");
+
+		int i=1;										//给输出的信息排序号
+		while(i)
+		{
+                s=NULL;	                                    //s初值NULL
+				p=showlink->next;						//p赋初值
+
+			while(p)
+			{
+				if(p->visit)
+				{
+
+					p=p->next;
+					continue;
+				}
+				if(s==NULL||!compare(p->data,s->data))s=p;
+
+				p=p->next;
+			}
+
+		if(s){
+
+				switch(s->data->changetype)
+				{
+					case 0:strcpy(changety,"收入");break;
+					case 1:strcpy(changety,"支出");break;
+				}
+					switch(s->data->moneytype)
+				{
+					case 0:strcpy(moneyty,"现金");break;
+					case 1:strcpy(moneyty,"支付宝");break;
+					case 2:strcpy(moneyty,"微信");break;
+					case 3:strcpy(moneyty,"银行卡");break;
+					case 4:strcpy(moneyty,"其他");break;
+				}
+
+			printf("%d\t%d年%d月%d日%d时\t\t%s\t    %s \t\t%.2f\n",i,s->data->t.year,s->data->t.month,s->data->t.day,s->data->t.hour,
+										changety,moneyty,s->data->money);
+				if(model)			//如果是修改模式 把输出的信息串成plink链
+				{
+					plink_s=(pointers)malloc(sizeof(pointersnode));
+					plink_s->next=NULL;
+					plink_s->data=s->data;
+					plink_p->next=plink_s;
+					plink_p=plink_p->next;
+				}
+				s->visit=1;				//找到一次最小值  输出之后visit置1表示输出过了
+				i++;					//序号加1
+
+			}
+			else break;
+
+
+        }
+        	printf("--------------------------------------------------------------------------------\n");
+	}
+	else if(tag==0)
+	{
+		printf("筛选条件下的收入信息(-1表示未记录)\n");
+		printf("序号\t\t时间\t\t      类型\t交易方式\t金额\n");
+		printf("--------------------------------------------------------------------------------\n");
+		p=showlink->next;
+		int i=1; 								//判断序号并且确定是否没有找到
+		while(i)
+		{
+			s=NULL;
+			while(p)
+		{
+			if(p->visit||p->data->changetype)
+			{
+				p=p->next;
+				continue;
+			}
+			if(s==NULL||!compare(p->data,s->data))s=p;
+			p=p->next;
+		}
+		if(s){
+			switch(s->data->moneytype)
+				{
+					case 0:strcpy(moneyty,"现金");break;
+					case 1:strcpy(moneyty,"支付宝");break;
+					case 2:strcpy(moneyty,"微信");break;
+					case 3:strcpy(moneyty,"银行卡");break;
+					case 4:strcpy(moneyty,"其他");break;
+				}
+			printf("%d\n%d年%d月%d日%d时收入\t%s\t%.2f\n",i,s->data->t.year,s->data->t.month,s->data->t.day,s->data->t.hour,
+													moneyty,s->data->money);
+			if(model)
+			{
+				plink_s=(pointers)malloc(sizeof(pointersnode));
+				plink_s->data=NULL;
+				plink_s->data=s->data;
+				plink_p->next=plink_s;
+				plink_p=plink_p->next;
+			}
+			s->visit=1;
+			i++;
+			}
+
+
+            if(i==1)
+            {
+                system("cls");
+                printf("找不到所要查找的信息\n");
+                Sleep(500);
+                goto A;
+            }
+            else break;
+
+        }
+		printf("--------------------------------------------------------------------------------\n");
+
+
+	}
+	else
+	{
+		printf("筛选条件下的支出信息(-1表示未记录)\n");
+		printf("序号\t\t时间\t\t      类型\t交易方式\t金额\n");
+		printf("--------------------------------------------------------------------------------\n");
+		p=showlink->next;
+		int i=1; 								//判断序号并且确定是否没有找到
+		while(i)
+		{
+			s=NULL;
+			while(p)
+		{
+			if(p->visit||!(p->data->changetype))
+			{
+				p=p->next;
+				continue;
+			}
+			if(s==NULL||!compare(p->data,s->data))s=p;
+			p=p->next;
+		}
+		if(s){
+			switch(s->data->moneytype)
+				{
+					case 0:strcpy(moneyty,"现金");break;
+					case 1:strcpy(moneyty,"支付宝");break;
+					case 2:strcpy(moneyty,"微信");break;
+					case 3:strcpy(moneyty,"银行卡");break;
+					case 4:strcpy(moneyty,"其他");break;
+				}
+			printf("%d\n%d年%d月%d日%d时支出\t%s\t%.2f\n",i,s->data->t.year,s->data->t.month,s->data->t.day,s->data->t.hour,
+													moneyty,s->data->money);
+			if(model)
+			{
+				plink_s=(pointers)malloc(sizeof(pointersnode));
+				plink_s->data=NULL;
+				plink_s->data=s->data;
+				plink_p->next=plink_s;
+				plink_p=plink_p->next;
+			}
+			s->visit=1;
+			i++;
+			}
+			else break;
+
+		}
+		if(i==1)
+		{
+			system("cls");
+			printf("找不到所要查找的信息\n");
+			Sleep(500);
+			goto A;
+		}
+		printf("--------------------------------------------------------------------------------\n");
+
+	}
+	A:if(!model)								//查询模式下
+		{
+			bool m;
+			printf("是否返回主菜单？0--更改查找信息继续查找，1--返回主菜单");
+			scanf("%d",&m);
+			if(m)return NULL;
+			else Findbytime(model);
+		}
+	else return plink;						//修改模式下返回plink链
+}
+
+void Change()
+{
+	bool sel;								//选项
+	system("cls");
+	printf("请先进行信息查询\n");			//根据筛选信息  查到后 对序号所表示的信息进行修改
+	printf("0--按时间查看收支信息\n");
+	printf("1--按交易方式查看信息\n");
+	scanf("%d",&sel);
+	pointers plink;
+	sel?plink=Findbytype(1):plink=Findbytime(1);				//获得plink链
+	printf("请输入需要修改的序号\n");
+	int st1;
+	A:scanf("%d",&st1);
+	int i=1;
+	pointers p=plink->next;
+	while(p)													//找到plink链中序号为st1的结构体
+	{
+		if(i==st1)
+			break;
+		i++;
+		p=p->next;
+	}
+	if(i!=st1)
+		{
+			printf("输入序号错误，请重新输入\n");
+			goto A;											//序号输入错误返回
+		}
+	else												//序号输入正确之后的修改
+	{
+		printf("请输入新的信息\n");
+		printf("请输入时间：（以下均填整数）\n");
+		printf("年：");
+		scanf("%d",&p->data->t.year);
+		printf("月：");
+		scanf("%d",&p->data->t.month);
+		printf("日(输入-1则只记到月)：");
+		scanf("%d",&p->data->t.day);
+		if(~(p->data->t.day))
+		{
+			printf("小时：");
+			scanf("%d",&p->data->t.hour);
+		}
+		else p->data->t.hour=-1;
+		printf("请输入那次是支出还是收入\t\t0--收入，1--支出\n");
+		scanf("%d",&p->data->changetype);
+		printf("请输入交易产生的途径\t\t0--现金，1--支付宝，2--微信，3--银行卡，4--其他\n");
+		scanf("%d",&p->data->moneytype);
+		if(p->data->changetype)
+		{
+			float cha,money_pre=p->data->money;      			//之前的钱以及差值   为了更新余额
+			printf("\n请输入那次支出（元）：\n");
+			scanf("%f",&p->data->money);
+			cha=p->data->money-money_pre;
+			changedata *st=mymoney;
+			while(st->next)										//找到尾节点  找到原余额
+			{
+				st=st->next;
+			}
+			st->balance-=cha;
+		}
+		else
+		{	float cha,money_pre=p->data->money;      //之前的钱以及差值
+			printf("\n请输入那次收入（元）：\n");
+			scanf("%f",&p->data->money);
+			cha=p->data->money-money_pre;
+			changedata *st=mymoney;
+			while(st->next)
+			{
+				st=st->next;
+			}
+			st->balance+=cha;
+		}
+	}
+	printf("是否保存？  0--否，1--是\n");
+	int sel1;
+	scanf("%d",&sel1);
+	if(sel1)Save();
+	printf("是否要继续修改？1--继续修改，0--返回主菜单\n");
+	int sel2;
+	scanf("%d",&sel2);
+	if(sel2)Change();
+	else return ;
+
+}
+
+void quit()
+{
+	system("cls");
+	Save();
+	printf("保存成功！\n");
+	printf("祝您生活愉快\n");
+	Sleep(3000);
+	exit(0);
+}
+void menu()
+{
+	system("cls");
+ 	ttime t;										//现在时间的结构体
+ 	t=GetTime();									//获取现在的时间
+	printf("  欢迎来到个人记账系统\t现在是%d年%d月%d日%d时\n",t.year,t.month,t.day,t.hour);
+	printf("-----------------------------------------\n");
+	printf("1.添加今日收支信息\n");
+	printf("2.补充往日收支信息\n");
+	printf("3.查看余额\n");
+	printf("4.按时间查看收支信息\n");
+	printf("5.按交易方式查看信息\n");
+	printf("6.修改已有收支信息\n");
+	printf("0.保存并退出\n");
+	printf("-----------------------------------------\n");
+	printf("请输入对应序号\n");
+	int sel;
+	scanf("%d",&sel);
+	switch(sel)
+	{
+		case 1:AddData(mymoney,1);break;
+		case 2:AddData(mymoney,0);break;
+		case 3:GetBalance();break;
+		case 4:Findbytime(0);break;
+		case 5:Findbytype(0);break;
+		case 6:Change();break;
+		case 0:quit();break;
+	}
+}
+
+int main()
+{
+    system("color F0\n");
+	mymoney->next=NULL;
+	mymoney->balance=0;
+	printf("启动中\n");					//启动界面友好
+	for(int i=0;i<=5;i++)
+	{
+		printf(".");
+		Sleep(200);
+	}
+	printf("\n");
+	system("cls");
+	load();									//启动前加载本地文件
+	while(1)
+	{
+		system("cls");
+		menu();
+	}
+
+	return 0;
+
+}
+

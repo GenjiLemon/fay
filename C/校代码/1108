@@ -1,0 +1,59 @@
+#include<stdio.h>
+#include<math.h>
+int main()
+{
+	float length(int ,int ,int ,int);
+	float acre(float ,float, float);
+	int x[110],y[110],n,i;
+	float sum,a,b,c,x,y;
+	while(scanf("%d",&n)!=EOF)
+	{
+		sum=0;
+		x=0;y=0;
+		if(n==0)continue;
+		for(i=1;i<=n;)
+		{
+			scanf("%d",&x[i]);
+			scanf("%d",&y[i]);
+			i+=2;
+		}
+		for(i=1;i<=n;i++)
+		{
+			x+=x[i];
+			y+=y[i];
+		}
+		x=x/n;y=y/n;
+		for(i=1;i<=n;i++)
+		{
+			if(i!=n)
+			{
+				a=length(x[i],x,y[i],y);
+				b=length(x[i+1],x,y[i+1],y);
+				c=length(x[i],x[i+1],y[i],y[i+1]);
+				sum+=acre(a,b,c);
+			}
+			else
+			{	a=length(x[n],x,y[n],y);
+				b=length(x[1],x,y[1],y);
+				c=length(x[n],x[1],y[n],y[1]);
+				sum+=acre(a,b,c);	
+			}
+		}
+		printf("%.1f\n",sum);
+		
+	}
+	return 0;
+}
+float length(a ,b,c,d)
+{
+	float z;
+	z=sqrt(pow(a-b,2)+pow(c-d,2));
+	return z;
+}
+float acre(a,b,c)
+{
+	float p,s;
+	p=(a+b+c)/2;
+	s=sqrt(p*(p-a)*(p-b)*(p-c));
+	return s;
+}

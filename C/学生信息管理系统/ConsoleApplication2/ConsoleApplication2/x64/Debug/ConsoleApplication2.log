@@ -1,0 +1,43 @@
+﻿C:\Program Files (x86)\VisualStudio\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(377,5): warning MSB8004: Output 目录未以斜杠结尾。  此生成实例将添加斜杠，因为必须有这个斜杠才能正确计算 Output 目录。
+cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
+  pch.cpp
+cl : 命令行 warning D9025: 正在重写“/sdl”(用“/GS-”)
+  ConsoleApplication2.cpp
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(99): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(115): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(127): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(132): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(142): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(156): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(168): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(172): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(176): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(181): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(192): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\consoleapplication2.cpp(204): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdlib.h(1274): note: 参见“_sleep”的声明
+  tinystr.cpp
+  tinyxml.cpp
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\xml\tinyxml.cpp(944): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\xml\tinyxml.cpp(1077): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(208): note: 参见“fopen”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\xml\tinyxml.cpp(1224): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: 参见“sscanf”的声明
+c:\users\lemon\desktop\consoleapplication2\consoleapplication2\xml\tinyxml.cpp(1231): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  e:\windows kits\10\include\10.0.17763.0\ucrt\stdio.h(2263): note: 参见“sscanf”的声明
+  tinyxmlerror.cpp
+  tinyxmlparser.cpp
+  正在生成代码...
+  ConsoleApplication2.vcxproj -> C:\Users\lemon\Desktop\ConsoleApplication2\ConsoleApplication2\.\bin\ConsoleApplication2.exe

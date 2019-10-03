@@ -1,0 +1,7 @@
+<student>
+    <Elements name="a3" code="23" age="26" sex="1" score="17" />
+    <Elements name="a4" code="52" age="17" sex="0" score="42" />
+    <Elements name="a5" code="15" age="22" sex="1" score="78" />
+    <Elements name="a6" code="23" age="31" sex="0" score="78" />
+    <Elements name="qweqe" code="123" age="123" sex="1" score="-858993460" />
+</student>

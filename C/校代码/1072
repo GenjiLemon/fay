@@ -1,0 +1,15 @@
+#include<stdio.h>
+int main()
+{
+	char a[3],temp;
+	while(scanf("%c",&a[0])!=EOF)
+	
+	{	scanf("%c%c",&a[1],&a[2]);	
+		if(a[0]>a[1]) temp=a[0],a[0]=a[1],a[1]=temp;
+		if(a[1]>a[2]) temp=a[1],a[1]=a[2],a[2]=temp;
+		if(a[0]>a[1]) temp=a[0],a[0]=a[1],a[1]=temp;
+	}
+	printf("%c %c %c",a[0],a[1],a[2]);
+	return 0;
+	
+}

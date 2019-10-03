@@ -1,0 +1,31 @@
+#include<stdio.h>
+int main()
+{
+	char a[60];
+	int n,i,m,hefa;
+	scanf("%d",&n);
+		getchar();
+		for(m=1;m<=n;m++)
+		{
+			gets(a);
+			hefa=1;
+			for(i=0;a[i]!='/0';i++)
+			{
+				if(a[i]>='a'&&a[i]<='z');
+				else if(a[i]>='A'&&a[i]<='Z');
+				else if(a[i]=='_');
+				else if(a[i]<='9'&&a[i]>='0');
+				else {hefa=0;break;}
+			}
+			if(a[0]<='9'&&a[0]>='0') hefa=0;
+			if(hefa==1) printf("yes\n");
+			else printf("no\n");
+			
+			
+		}
+		return 0;
+	
+	
+	
+	
+}

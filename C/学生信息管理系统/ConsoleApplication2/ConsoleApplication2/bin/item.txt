@@ -1,0 +1,11 @@
+<shop>
+<Item name="nike" price="999"/>
+<ITen name="nikon" price="10000"/>
+<Item name="Advon" price="99"/>
+</shop>
+
+<weapon>
+<Item name="big¸ç¸ç" price="555"/>
+<ITen name="zhong¹þ¹þ" price="444"/>
+<Item name="Ð¡µÜµÜ" price="333"/>
+</weapon>

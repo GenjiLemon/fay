@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="/Note">
+    <file>note.qrc</file>
+    <file>Resources/Myapp.ico</file>
+    <file>Resources/1.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,38 @@
+#include<stdio.h>
+#include<string.h>
+int main()
+{
+	int case,k,l,i;
+	char a[60],b[60],c[130];
+	int hui(char c[]);
+	scanf("%d",&case);
+	for(l=0;l<case;l++)
+	{
+		k=0;
+		gets(a);
+		gets(b);
+		for(i=0;i<=strlen(a);i++)
+		{
+			strcpy(c,a,i);
+			strcat(c,b);
+			if(hui(c)) k++;
+		}
+		printf("%d",k);
+	}
+	return 0;
+}
+int hui(char c[])
+{
+	
+	int l,i,j,hui;
+	hui=1;
+	l=strlen(c);
+	for(i=0,j=l-1;i<j;i++,j--)
+	
+		if(c[i]!=c[j])
+		{
+			hui=0;
+			break;
+		}
+	return hui;
+}
